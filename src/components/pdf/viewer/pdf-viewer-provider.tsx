@@ -1,36 +1,7 @@
-import { createContext, useContext, useReducer, useCallback, type ReactNode } from 'react';
+import { useReducer, useCallback, type ReactNode } from 'react';
 import type { PdfAnnotation, ActiveTool } from '../types/pdf-annotation';
 import { pdfViewerReducer, initialState } from './pdf-viewer-reducer';
-
-interface PdfViewerContextValue {
-  state: ReturnType<typeof pdfViewerReducer>;
-  dispatch: React.Dispatch<Parameters<typeof pdfViewerReducer>[1]>;
-  setFile: (file: string | ArrayBuffer) => void;
-  setCurrentPage: (page: number) => void;
-  nextPage: () => void;
-  prevPage: () => void;
-  zoomIn: () => void;
-  zoomOut: () => void;
-  resetZoom: () => void;
-  setScale: (scale: number) => void;
-  setRotation: (rotation: number) => void;
-  setActiveTool: (tool: ActiveTool) => void;
-  setHighlightColor: (color: string) => void;
-  addAnnotation: (annotation: Omit<PdfAnnotation, 'id' | 'createdAt'>) => void;
-  removeAnnotation: (id: string) => void;
-  updateAnnotation: (annotation: PdfAnnotation) => void;
-  toggleThumbnails: () => void;
-}
-
-const PdfViewerContext = createContext<PdfViewerContextValue | null>(null);
-
-export function usePdfViewer() {
-  const context = useContext(PdfViewerContext);
-  if (!context) {
-    throw new Error('usePdfViewer must be used within a PdfViewer.Root');
-  }
-  return context;
-}
+import { PdfViewerContext, type PdfViewerContextValue } from './pdf-viewer-context';
 
 interface PdfViewerProviderProps {
   children: ReactNode;

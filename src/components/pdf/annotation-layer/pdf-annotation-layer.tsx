@@ -1,7 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { usePdfViewer } from '../viewer/pdf-viewer-context';
 import type { PdfAnnotation } from '../types/pdf-annotation';
-import './pdf-annotation-layer.css';
 
 interface PdfAnnotationLayerProps {
   pageNumber: number;
@@ -124,80 +123,90 @@ export function PdfAnnotationLayer({ pageNumber }: PdfAnnotationLayerProps) {
     [removeAnnotation, editingNote]
   );
 
+  const layerClasses = `absolute inset-0 z-10 cursor-default ${
+    activeTool !== 'none' ? 'cursor-crosshair pointer-events-auto' : 'pointer-events-none'
+  }`;
+
   return (
     <div
       ref={layerRef}
-      className={`pdf-annotation-layer ${activeTool !== 'none' ? 'pdf-annotation-layer--drawing' : ''}`}
+      className={layerClasses}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
     >
-      {pageAnnotations.map((annotation) => (
-        <div
-          key={annotation.id}
-          className={`pdf-annotation ${annotation.type === 'highlight' ? 'pdf-annotation--highlight' : 'pdf-annotation--note'}`}
-          style={{
-            left: annotation.x * scale,
-            top: annotation.y * scale,
-            width: annotation.width * scale,
-            height: annotation.height * scale,
-            backgroundColor:
-              annotation.type === 'highlight'
-                ? annotation.color + '66'
-                : annotation.color,
-            borderColor: annotation.color,
-          }}
-          onClick={(e) => {
-            e.stopPropagation();
-            handleNoteClick(annotation);
-          }}
-        >
-          {annotation.type === 'note' && (
-            <span className="pdf-annotation__note-icon">📝</span>
-          )}
+      {pageAnnotations.map((annotation) => {
+        const isHighlight = annotation.type === 'highlight';
+        const annotationClasses = `absolute border-2 border-transparent pointer-events-auto cursor-pointer ${
+          isHighlight
+            ? 'rounded-sm mix-blend-multiply hover:brightness-90'
+            : 'flex items-center justify-center rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.2)]'
+        }`;
 
-          {editingNote === annotation.id && (
-            <div
-              className="pdf-annotation__popover"
-              style={{ top: annotation.height * scale + 4 }}
-            >
-              <textarea
-                className="pdf-annotation__textarea"
-                value={noteText}
-                onChange={(e) => setNoteText(e.target.value)}
-                placeholder="Enter your note..."
-                rows={3}
-                autoFocus
-              />
-              <div className="pdf-annotation__actions">
-                <button
-                  className="pdf-annotation__btn pdf-annotation__btn--save"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    saveNote();
-                  }}
-                >
-                  Save
-                </button>
-                <button
-                  className="pdf-annotation__btn pdf-annotation__btn--delete"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    deleteAnnotation(annotation.id);
-                  }}
-                >
-                  Delete
-                </button>
+        return (
+          <div
+            key={annotation.id}
+            className={annotationClasses}
+            style={{
+              left: annotation.x * scale,
+              top: annotation.y * scale,
+              width: annotation.width * scale,
+              height: annotation.height * scale,
+              backgroundColor: isHighlight ? annotation.color + '66' : annotation.color,
+              borderColor: annotation.color,
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleNoteClick(annotation);
+            }}
+          >
+            {annotation.type === 'note' && (
+              <span className="text-sm leading-none">📝</span>
+            )}
+
+            {editingNote === annotation.id && (
+              <div
+                className="absolute left-0 min-w-[200px] p-2.5 border rounded-lg z-20 bg-surface border-border shadow-[0_8px_24px_rgba(0,0,0,0.15)]"
+                style={{ top: annotation.height * scale + 4 }}
+              >
+                <textarea
+                  className="w-full min-h-[60px] p-2 mb-2 text-sm border rounded-md resize-y text-text-heading bg-surface border-border focus:outline-none focus:border-accent focus:shadow-[0_0_0_2px_var(--color-accent-bg)]"
+                  value={noteText}
+                  onChange={(e) => setNoteText(e.target.value)}
+                  placeholder="Enter your note..."
+                  rows={3}
+                  autoFocus
+                />
+                <div className="flex justify-end gap-1.5">
+                  <button
+                    className="px-3 py-1.5 text-xs rounded-md border cursor-pointer transition-all duration-150 bg-accent text-white border-accent hover:bg-[#9333ea]"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      saveNote();
+                    }}
+                  >
+                    Save
+                  </button>
+                  <button
+                    className="px-3 py-1.5 text-xs rounded-md border cursor-pointer transition-all duration-150 bg-transparent text-[#ef4444] border-[#ef4444] hover:bg-[#fef2f2]"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteAnnotation(annotation.id);
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
-        </div>
-      ))}
+            )}
+          </div>
+        );
+      })}
 
       {drawing && currentRect && activeTool === 'highlight' && (
         <div
-          className="pdf-annotation pdf-annotation--drawing"
+          className="absolute border-2 rounded-sm pointer-events-none"
           style={{
             left: currentRect.x * scale,
             top: currentRect.y * scale,

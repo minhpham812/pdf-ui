@@ -26,3 +26,17 @@
     -moz-osx-font-smoothing: grayscale;
   }
 }
+
+/* Override react-pdf's annotation-layer to overlay the page without intercepting pointer events */
+@layer components {
+  .react-pdf__Page .annotation-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .react-pdf__Page .annotation-layer > * {
+    pointer-events: auto;
+  }
+}
+

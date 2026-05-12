@@ -2,13 +2,12 @@ import { useCallback } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
-import { PdfViewerProvider } from './pdf-viewer-context';
+import { PdfViewerProvider } from './pdf-viewer-provider';
 import { usePdfViewer } from './pdf-viewer-context';
 import { PdfAnnotationLayer } from '../annotation-layer/pdf-annotation-layer';
 import { PdfToolbar } from '../toolbar/pdf-toolbar';
 import { PdfThumbnails } from '../thumbnails/pdf-thumbnails';
 import type { PdfViewerState } from '../types/pdf-annotation';
-import './pdf-viewer.css';
 
 // Worker setup for react-pdf v7+
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
@@ -32,11 +31,14 @@ function PdfViewerInner({ className = '' }: { className?: string }) {
   }, []);
 
   return (
-    <div className={`pdf-viewer ${className}`} ref={containerRef}>
+    <div
+      className={`flex flex-col h-full w-full overflow-hidden border rounded-lg bg-surface border-border ${className}`}
+      ref={containerRef}
+    >
       <PdfToolbar />
-      <div className="pdf-viewer__content">
+      <div className="flex flex-1 overflow-hidden">
         {state.showThumbnails && <PdfThumbnails />}
-        <div className="pdf-viewer__pages">
+        <div className="flex flex-col items-center flex-1 p-4 overflow-auto bg-[#525659]">
           <PageRenderer
             pageNumber={state.currentPage}
             scale={state.scale}
@@ -69,10 +71,10 @@ function PageRenderer({ pageNumber, scale, rotation }: PageRendererProps) {
       onLoadError={(error) => {
         dispatch({ type: 'SET_ERROR', payload: error.message });
       }}
-      loading={<div className="pdf-viewer__loading">Loading PDF...</div>}
-      error={<div className="pdf-viewer__error">Failed to load PDF</div>}
+      loading={<div className="flex items-center justify-center min-h-[200px] p-8 text-sm text-[#aaa]">Loading PDF...</div>}
+      error={<div className="flex items-center justify-center min-h-[200px] p-8 text-sm text-red-400">Failed to load PDF</div>}
     >
-      <div className="pdf-viewer__page-wrapper">
+      <div className="relative bg-white shadow-[0_4px_16px_rgba(0,0,0,0.3)]">
         <Page
           pageNumber={pageNumber}
           scale={scale}

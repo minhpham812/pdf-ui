@@ -37,21 +37,21 @@ function App() {
   if (!pdfUrl) {
     return (
       <div
-        className="pdf-uploader"
+        className="flex items-center justify-center min-h-screen p-8 cursor-pointer"
         onDragOver={(e) => e.preventDefault()}
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
       >
-        <div className="pdf-uploader__content">
-          <div className="pdf-uploader__icon">📄</div>
-          <h2>PDF Viewer</h2>
-          <p>Drop a PDF file here, or click to browse</p>
+        <div className="flex flex-col items-center gap-4 p-16 text-center border-2 border-dashed rounded-2xl border-border bg-surface hover:border-accent hover:bg-accent-bg transition-all duration-200">
+          <div className="text-[200px] leading-none select-none pointer-events-none">📄</div>
+          <h2 className="text-2xl font-semibold text-text-heading m-0">PDF Viewer</h2>
+          <p className="text-sm text-text m-0">Drop a PDF file here, or click to browse</p>
           <input
             ref={fileInputRef}
             type="file"
             accept="application/pdf"
             onChange={handleFileChange}
-            style={{ display: 'none' }}
+            className="hidden"
           />
         </div>
       </div>
@@ -59,7 +59,7 @@ function App() {
   }
 
   return (
-    <div className="app-container">
+    <div className="w-screen h-screen">
       <PdfViewer file={pdfUrl} />
     </div>
   )
