@@ -1,16 +1,14 @@
 import { useCallback } from 'react';
-import { Document, Page, pdfjs } from 'react-pdf';
+import { Document, Page } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
+import '../../../utils/pdf-worker';
 import { PdfViewerProvider } from './pdf-viewer-provider';
 import { usePdfViewer } from './pdf-viewer-context';
 import { PdfAnnotationLayer } from '../annotation-layer/pdf-annotation-layer';
 import { PdfToolbar } from '../toolbar/pdf-toolbar';
 import { PdfThumbnails } from '../thumbnails/pdf-thumbnails';
 import type { PdfViewerState } from '../types/pdf-annotation';
-
-// Worker setup for react-pdf v7+
-pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 interface PdfViewerProps {
   file: string;
