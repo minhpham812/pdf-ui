@@ -1,0 +1,1 @@
+export { PdfHighlightTool } from './pdf-highlight-tool';

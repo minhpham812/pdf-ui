@@ -1,0 +1,1 @@
+export { PdfThumbnails } from './pdf-thumbnails';
