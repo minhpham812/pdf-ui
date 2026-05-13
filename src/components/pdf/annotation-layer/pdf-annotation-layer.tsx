@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback } from 'react';
 import { usePdfViewer } from '../viewer/pdf-viewer-context';
 import type { PdfAnnotation } from '../types/pdf-annotation';
+import { NotebookPen } from 'lucide-react';
 
 interface PdfAnnotationLayerProps {
   pageNumber: number;
@@ -83,7 +84,7 @@ export function PdfAnnotationLayer({ pageNumber }: PdfAnnotationLayerProps) {
         y: startPos?.y ?? currentRect.y,
         width: 24,
         height: 24,
-        color: '#ffe066',
+        color: '#f5efa3',
         content: '',
       });
       setEditingNote(noteId);
@@ -162,7 +163,9 @@ export function PdfAnnotationLayer({ pageNumber }: PdfAnnotationLayerProps) {
             }}
           >
             {annotation.type === 'note' && (
-              <span className="text-sm leading-none">📝</span>
+              <span className="text-sm leading-none">
+                <NotebookPen className='w-4 h-4'/>
+              </span>
             )}
 
             {editingNote === annotation.id && (

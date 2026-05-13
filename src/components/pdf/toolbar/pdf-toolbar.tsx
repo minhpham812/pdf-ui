@@ -1,3 +1,13 @@
+import {
+  ChevronLeft,
+  ChevronRight,
+  Minus,
+  Plus,
+  RotateCcw,
+  Highlighter,
+  LayoutGrid,
+  NotebookPen,
+} from 'lucide-react';
 import { usePdfViewer } from '../viewer/pdf-viewer-context';
 
 const BTN_BASE =
@@ -31,7 +41,7 @@ export function PdfToolbar() {
           disabled={currentPage <= 1}
           title="Previous page"
         >
-          ◀
+          <ChevronLeft className="w-4 h-4" />
         </button>
         <span className="flex items-center gap-1 text-sm text-text">
           <input
@@ -50,7 +60,7 @@ export function PdfToolbar() {
           disabled={currentPage >= numPages}
           title="Next page"
         >
-          ▶
+          <ChevronRight className="w-4 h-4" />
         </button>
       </div>
 
@@ -58,14 +68,14 @@ export function PdfToolbar() {
 
       <div className="flex items-center gap-1">
         <button className={`${BTN_BASE} ${BTN_IDLE}`} onClick={zoomOut} title="Zoom out">
-          −
+          <Minus className="w-4 h-4" />
         </button>
         <span className="min-w-[48px] text-center text-sm text-text">{scalePercent}%</span>
         <button className={`${BTN_BASE} ${BTN_IDLE}`} onClick={zoomIn} title="Zoom in">
-          +
+          <Plus className="w-4 h-4" />
         </button>
         <button className={`${BTN_BASE} ${BTN_IDLE}`} onClick={resetZoom} title="Reset zoom">
-          ⟲
+          <RotateCcw className="w-4 h-4" />
         </button>
       </div>
 
@@ -77,7 +87,7 @@ export function PdfToolbar() {
           onClick={() => setActiveTool(activeTool === 'highlight' ? 'none' : 'highlight')}
           title="Highlight tool"
         >
-          🖍️
+          <Highlighter className="w-4 h-4" />
         </button>
         {activeTool === 'highlight' && (
           <input
@@ -93,7 +103,7 @@ export function PdfToolbar() {
           onClick={() => setActiveTool(activeTool === 'note' ? 'none' : 'note')}
           title="Note tool"
         >
-          📝
+          <NotebookPen className="w-4 h-4" />
         </button>
       </div>
 
@@ -105,7 +115,7 @@ export function PdfToolbar() {
           onClick={toggleThumbnails}
           title="Toggle thumbnails"
         >
-        {showThumbnails ? '⍇' : '⍈'}  
+          <LayoutGrid className="w-4 h-4" />
         </button>
       </div>
     </div>
