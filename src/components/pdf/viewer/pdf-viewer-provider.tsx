@@ -2,6 +2,7 @@ import { useReducer, useCallback, type ReactNode } from 'react';
 import type { PdfAnnotation, ActiveTool } from '../types/pdf-annotation';
 import { pdfViewerReducer, initialState } from './pdf-viewer-reducer';
 import { PdfViewerContext, type PdfViewerContextValue } from './pdf-viewer-context';
+import { DrawingProvider } from '../drawing-tool/drawing-context';
 
 interface PdfViewerProviderProps {
   children: ReactNode;
@@ -116,7 +117,9 @@ export function PdfViewerProvider({
 
   return (
     <PdfViewerContext.Provider value={value}>
-      {children}
+      <DrawingProvider>
+        {children}
+      </DrawingProvider>
     </PdfViewerContext.Provider>
   );
 }

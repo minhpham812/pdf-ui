@@ -5,6 +5,8 @@ import {
   Plus,
   RotateCcw,
   Highlighter,
+  Pencil,
+  Eraser,
   LayoutGrid,
   NotebookPen,
 } from 'lucide-react';
@@ -25,11 +27,10 @@ export function PdfToolbar() {
     resetZoom,
     setCurrentPage,
     setActiveTool,
-    setHighlightColor,
     toggleThumbnails,
   } = usePdfViewer();
 
-  const { currentPage, numPages, scale, activeTool, highlightColor, showThumbnails } = state;
+  const { currentPage, numPages, scale, activeTool, showThumbnails } = state;
   const scalePercent = Math.round(scale * 100);
 
   return (
@@ -89,15 +90,20 @@ export function PdfToolbar() {
         >
           <Highlighter className="w-4 h-4" />
         </button>
-        {activeTool === 'highlight' && (
-          <input
-            type="color"
-            className="p-0 bg-transparent border rounded cursor-pointer w-7 h-7 border-border"
-            value={highlightColor}
-            onChange={(e) => setHighlightColor(e.target.value)}
-            title="Highlight color"
-          />
-        )}
+        <button
+          className={`${BTN_BASE} ${activeTool === 'note' ? BTN_ACTIVE : BTN_IDLE}`}
+          onClick={() => setActiveTool(activeTool === 'draw' ? 'none' : 'draw')}
+          title="Drawing tool"
+        >
+          <Pencil className="w-4 h-4" />
+        </button>
+        <button
+          className={`${BTN_BASE} ${activeTool === 'erase' ? BTN_ACTIVE : BTN_IDLE}`}
+          onClick={() => setActiveTool(activeTool === 'erase' ? 'none' : 'erase')}
+          title="Eraser"
+        >
+          <Eraser className="w-4 h-4" />
+        </button>
         <button
           className={`${BTN_BASE} ${activeTool === 'note' ? BTN_ACTIVE : BTN_IDLE}`}
           onClick={() => setActiveTool(activeTool === 'note' ? 'none' : 'note')}

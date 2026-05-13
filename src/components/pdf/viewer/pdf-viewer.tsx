@@ -1,12 +1,11 @@
 import { useEffect, useRef, type ReactNode } from 'react';
-import { Document, Page } from 'react-pdf';
+import { Document } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 import '../../../utils/pdf-worker';
 import { PdfViewerProvider } from './pdf-viewer-provider';
 import { usePdfViewer } from './pdf-viewer-context';
-import { PdfAnnotationLayer } from '../annotation-layer/pdf-annotation-layer';
-import type { PdfAnnotation } from '../types/pdf-annotation';
+import { PdfViewerPage } from '../pdf-page';
 
 // ---------------------------------------------------------------------------
 // Root
@@ -16,7 +15,7 @@ export interface PdfViewerRootProps {
   url?: string | ArrayBuffer;
   file?: string | ArrayBuffer;
   initialScale?: number;
-  initialAnnotations?: PdfAnnotation[];
+  initialAnnotations?: import('../types/pdf-annotation').PdfAnnotation[];
   children?: ReactNode;
   className?: string;
 }
@@ -82,35 +81,6 @@ export function PdfViewerRoot({
     >
       <RootLayout className={className}>{children}</RootLayout>
     </PdfViewerProvider>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Page
-// ---------------------------------------------------------------------------
-
-export interface PdfViewerPageProps {
-  pageNumber: number;
-  className?: string;
-}
-
-export function PdfViewerPage({ pageNumber, className = '' }: PdfViewerPageProps) {
-  const { state } = usePdfViewer();
-  return (
-    <div
-      data-page-number={pageNumber}
-      className={`relative bg-white shadow-[0_4px_16px_rgba(0,0,0,0.3)] ${className}`}
-    >
-      <Page
-        pageNumber={pageNumber}
-        scale={state.scale}
-        rotate={state.rotation}
-        renderAnnotationLayer={true}
-        renderTextLayer={true}
-        renderMode="canvas"
-      />
-      <PdfAnnotationLayer pageNumber={pageNumber} />
-    </div>
   );
 }
 
@@ -202,9 +172,10 @@ export function PdfViewerPages({ className = '' }: { className?: string }) {
     const pages = container.querySelectorAll<HTMLElement>('[data-page-number]');
     pages.forEach((page) => observer.observe(page));
 
+    const pageRatios = pageRatiosRef.current;
     return () => {
       observer.disconnect();
-      pageRatiosRef.current.clear();
+      pageRatios.clear();
     };
   }, [state.numPages, setCurrentPage]);
 

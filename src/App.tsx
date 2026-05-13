@@ -64,8 +64,13 @@ function App() {
         <PdfViewer.Toolbar />
         <div className="flex flex-1 overflow-hidden">
           <PdfViewer.Thumbnails />
-          <div className="flex flex-col items-center flex-1 p-4 overflow-auto bg-[#525659]">
-            <PdfViewer.Pages />
+          <div className="relative flex flex-col items-center flex-1 bg-[#525659] overflow-hidden">
+            <div className="flex flex-col items-center flex-1 p-4 overflow-auto w-full">
+              <PdfViewer.Pages />
+            </div>
+            <PdfViewer.HighlightTool />
+            <PdfViewer.NoteTool />
+            <PdfViewer.DrawingTool />
           </div>
         </div>
       </PdfViewer.Root>
