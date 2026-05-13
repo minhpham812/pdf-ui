@@ -8,8 +8,11 @@ import {
   Pencil,
   Eraser,
   LayoutGrid,
+  Download,
 } from 'lucide-react';
+import { useState } from 'react';
 import { usePdfViewer } from '../viewer/pdf-viewer-context';
+import { savePdfWithAnnotations, downloadBlobUrl } from '../../../utils/pdf-save-utils';
 
 const BTN_BASE =
   'inline-flex items-center justify-center w-8 h-8 border rounded-md transition-all duration-150 hover:bg-social-bg hover:border-border disabled:opacity-40 disabled:cursor-not-allowed';
@@ -29,8 +32,25 @@ export function PdfToolbar() {
     toggleThumbnails,
   } = usePdfViewer();
 
-  const { currentPage, numPages, scale, activeTool, showThumbnails } = state;
+  const { currentPage, numPages, scale, activeTool, showThumbnails, file, annotations } = state;
   const scalePercent = Math.round(scale * 100);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async () => {
+    if (!file || isSaving) return;
+    setIsSaving(true);
+    try {
+      const url = await savePdfWithAnnotations(file, annotations);
+      const filename = typeof file === 'string'
+        ? file.split('/').pop()?.replace('.pdf', '-annotated.pdf') ?? 'document-annotated.pdf'
+        : 'document-annotated.pdf';
+      downloadBlobUrl(url, filename);
+    } catch (err) {
+      console.error('Failed to save PDF:', err);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <div className="flex items-center gap-1 p-2 px-3 border-b shrink-0 bg-surface border-border">
@@ -114,6 +134,14 @@ export function PdfToolbar() {
           title="Toggle thumbnails"
         >
           <LayoutGrid className="w-4 h-4" />
+        </button>
+        <button
+          className={`${BTN_BASE} ${BTN_IDLE} ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
+          onClick={handleSave}
+          disabled={!file || isSaving}
+          title="Save PDF with annotations"
+        >
+          <Download className="w-4 h-4" />
         </button>
       </div>
     </div>

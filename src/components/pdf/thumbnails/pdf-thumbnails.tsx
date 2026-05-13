@@ -6,9 +6,14 @@ export function PdfThumbnails() {
   const { state, setCurrentPage } = usePdfViewer();
   const { numPages, currentPage, file, showThumbnails } = state;
   const activeThumbRef = useRef<HTMLButtonElement>(null);
+  const skipScrollRef = useRef(false);
 
-  // Scroll active thumbnail into view when currentPage changes
+  // Scroll active thumbnail into view when currentPage changes from scrolling PDF
   useEffect(() => {
+    if (skipScrollRef.current) {
+      skipScrollRef.current = false;
+      return;
+    }
     if (activeThumbRef.current) {
       activeThumbRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
@@ -29,7 +34,10 @@ export function PdfThumbnails() {
             className={`relative flex flex-col items-center gap-1 p-2 border-2 border-transparent rounded-md transition-all duration-150 cursor-pointer hover:bg-social-bg ${
               currentPage === pageNum ? 'border-accent bg-accent-bg' : 'bg-transparent'
             }`}
-            onClick={() => setCurrentPage(pageNum)}
+            onClick={() => {
+              skipScrollRef.current = true;
+              setCurrentPage(pageNum);
+            }}
             title={`Page ${pageNum}`}
           >
             <Page

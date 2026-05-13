@@ -93,6 +93,7 @@ export function PdfViewerPages({ className = '' }: { className?: string }) {
   const { state, setCurrentPage } = usePdfViewer();
   const containerRef = useRef<HTMLDivElement>(null);
   const skipNextScrollRef = useRef(false);
+  const isUserScrolling = useRef(false);
   const isProgrammaticScroll = useRef(false);
   const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pageRatiosRef = useRef<Map<number, number>>(new Map());
@@ -118,10 +119,6 @@ export function PdfViewerPages({ className = '' }: { className?: string }) {
     if (target) {
       isProgrammaticScroll.current = true;
       target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-      scrollTimeoutRef.current = setTimeout(() => {
-        isProgrammaticScroll.current = false;
-      }, 600);
     }
   }, [state.currentPage, state.numPages]);
 
@@ -134,9 +131,24 @@ export function PdfViewerPages({ className = '' }: { className?: string }) {
     const scrollParent = container.parentElement;
     if (!scrollParent) return;
 
+    const handleScroll = () => {
+      if (isProgrammaticScroll.current) {
+        isProgrammaticScroll.current = false;
+        isUserScrolling.current = false;
+        return;
+      }
+      isUserScrolling.current = true;
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+      scrollTimeoutRef.current = setTimeout(() => {
+        isUserScrolling.current = false;
+      }, 150);
+    };
+
+    scrollParent.addEventListener('scroll', handleScroll, { passive: true });
+
     const observer = new IntersectionObserver(
       (entries) => {
-        if (isProgrammaticScroll.current) return;
+        if (!isUserScrolling.current) return;
 
         entries.forEach((entry) => {
           const pageNum = Number(
@@ -176,6 +188,7 @@ export function PdfViewerPages({ className = '' }: { className?: string }) {
     return () => {
       observer.disconnect();
       pageRatios.clear();
+      scrollParent.removeEventListener('scroll', handleScroll);
     };
   }, [state.numPages, setCurrentPage]);
 
