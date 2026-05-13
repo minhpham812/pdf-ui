@@ -21,6 +21,5 @@ export {
   PdfThumbnails,
   PdfAnnotationLayer,
   PdfHighlightTool,
-  PdfNoteTool,
   PdfDrawingTool,
 } from './index.parts';

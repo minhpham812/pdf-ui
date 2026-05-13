@@ -69,7 +69,6 @@ function App() {
               <PdfViewer.Pages />
             </div>
             <PdfViewer.HighlightTool />
-            <PdfViewer.NoteTool />
             <PdfViewer.DrawingTool />
           </div>
         </div>

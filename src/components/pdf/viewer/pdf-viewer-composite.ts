@@ -5,7 +5,6 @@ import { PdfToolbar } from '../toolbar/pdf-toolbar';
 import { PdfThumbnails } from '../thumbnails/pdf-thumbnails';
 import { PdfAnnotationLayer } from '../annotation-layer/pdf-annotation-layer';
 import { PdfHighlightTool } from '../pdf-highlight-tool';
-import { PdfNoteTool } from '../pdf-note-tool';
 import { PdfDrawingTool } from '../pdf-drawing-tool';
 
 // Composite export (base-ui style).
@@ -19,7 +18,6 @@ export const PdfViewer = {
   Thumbnails: PdfThumbnails,
   AnnotationLayer: PdfAnnotationLayer,
   HighlightTool: PdfHighlightTool,
-  NoteTool: PdfNoteTool,
   DrawingTool: PdfDrawingTool,
 };
 

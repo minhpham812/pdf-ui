@@ -8,7 +8,6 @@ import {
   Pencil,
   Eraser,
   LayoutGrid,
-  NotebookPen,
 } from 'lucide-react';
 import { usePdfViewer } from '../viewer/pdf-viewer-context';
 
@@ -91,7 +90,7 @@ export function PdfToolbar() {
           <Highlighter className="w-4 h-4" />
         </button>
         <button
-          className={`${BTN_BASE} ${activeTool === 'note' ? BTN_ACTIVE : BTN_IDLE}`}
+          className={`${BTN_BASE} ${activeTool === 'draw' ? BTN_ACTIVE : BTN_IDLE}`}
           onClick={() => setActiveTool(activeTool === 'draw' ? 'none' : 'draw')}
           title="Drawing tool"
         >
@@ -103,13 +102,6 @@ export function PdfToolbar() {
           title="Eraser"
         >
           <Eraser className="w-4 h-4" />
-        </button>
-        <button
-          className={`${BTN_BASE} ${activeTool === 'note' ? BTN_ACTIVE : BTN_IDLE}`}
-          onClick={() => setActiveTool(activeTool === 'note' ? 'none' : 'note')}
-          title="Note tool"
-        >
-          <NotebookPen className="w-4 h-4" />
         </button>
       </div>
 

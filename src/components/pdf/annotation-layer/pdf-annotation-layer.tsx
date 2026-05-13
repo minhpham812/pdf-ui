@@ -1,6 +1,4 @@
-import { Popover } from '@base-ui/react/popover';
 import { usePdfViewer } from '../viewer/pdf-viewer-context';
-import { NotebookPen } from 'lucide-react';
 
 interface PdfAnnotationLayerProps {
   pageNumber: number;
@@ -13,7 +11,6 @@ interface PdfAnnotationLayerProps {
  * Absolute-positioned overlay that renders annotations for a single page.
  * - Drawings: freehand strokes as SVG polylines
  * - Highlights: semi-transparent colored rectangles
- * - Notes: clickable markers with @base-ui/react Popover for viewing text
  */
 export function PdfAnnotationLayer({
   pageNumber,
@@ -102,38 +99,6 @@ export function PdfAnnotationLayer({
           );
         }
 
-        // Note annotation with Popover
-        return (
-          <Popover.Root key={annotation.id}>
-            <Popover.Trigger
-              className="absolute flex items-center justify-center w-6 h-6 rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.2)] pointer-events-auto transition-transform hover:scale-110"
-              style={{
-                left: `${annotation.x}%`,
-                top: `${annotation.y}%`,
-                backgroundColor: annotation.color,
-                zIndex: 15,
-              }}
-            >
-              <NotebookPen className="w-3.5 h-3.5 text-yellow-900" />
-            </Popover.Trigger>
-            <Popover.Portal>
-              <Popover.Positioner align="center" side="top" sideOffset={8}>
-                <Popover.Popup className="rounded-lg border border-border bg-surface p-3 shadow-lg max-w-xs z-50">
-                  <Popover.Arrow className="fill-surface stroke-border" />
-                  <p className="text-sm text-text whitespace-pre-wrap">
-                    {annotation.content || 'No note text'}
-                  </p>
-                  <button
-                    className="mt-2 text-xs text-red-500 hover:underline cursor-pointer"
-                    onClick={() => removeAnnotation(annotation.id)}
-                  >
-                    Delete note
-                  </button>
-                </Popover.Popup>
-              </Popover.Positioner>
-            </Popover.Portal>
-          </Popover.Root>
-        );
       })}
 
       {/* Live stroke preview */}

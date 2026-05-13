@@ -1,4 +1,4 @@
-export type AnnotationType = 'highlight' | 'note' | 'drawing';
+export type AnnotationType = 'highlight' | 'drawing';
 
 export interface DrawingPoint {
   x: number; // percentage of page width
@@ -25,7 +25,7 @@ export interface PdfViewport {
   scale: number;
 }
 
-export type ActiveTool = 'none' | 'highlight' | 'note' | 'draw' | 'erase';
+export type ActiveTool = 'none' | 'highlight' | 'draw' | 'erase';
 
 export interface PdfViewerState {
   file: string | ArrayBuffer | null;

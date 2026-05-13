@@ -6,7 +6,6 @@ export { PdfToolbar } from './toolbar/pdf-toolbar';
 export { PdfThumbnails } from './thumbnails/pdf-thumbnails';
 export { PdfAnnotationLayer } from './annotation-layer/pdf-annotation-layer';
 export { PdfHighlightTool } from './pdf-highlight-tool';
-export { PdfNoteTool } from './pdf-note-tool';
 export { PdfDrawingTool } from './pdf-drawing-tool';
 export { PdfViewer } from './viewer/pdf-viewer-composite';
 
