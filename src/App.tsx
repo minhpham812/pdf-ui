@@ -60,7 +60,15 @@ function App() {
 
   return (
     <div className="w-screen h-screen">
-      <PdfViewer file={pdfUrl} />
+      <PdfViewer.Root url={pdfUrl} initialScale={1} className="w-screen h-screen">
+        <PdfViewer.Toolbar />
+        <div className="flex flex-1 overflow-hidden">
+          <PdfViewer.Thumbnails />
+          <div className="flex flex-col items-center flex-1 p-4 overflow-auto bg-[#525659]">
+            <PdfViewer.Pages />
+          </div>
+        </div>
+      </PdfViewer.Root>
     </div>
   )
 }

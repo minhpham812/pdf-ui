@@ -6,17 +6,21 @@ import { PdfViewerContext, type PdfViewerContextValue } from './pdf-viewer-conte
 interface PdfViewerProviderProps {
   children: ReactNode;
   file?: string | ArrayBuffer;
+  initialScale?: number;
   initialAnnotations?: PdfAnnotation[];
 }
 
 export function PdfViewerProvider({
   children,
   file,
+  initialScale = 1,
   initialAnnotations = [],
 }: PdfViewerProviderProps) {
   const [state, dispatch] = useReducer(pdfViewerReducer, {
     ...initialState,
     file: file ?? null,
+    defaultScale: initialScale,
+    scale: initialScale,
     annotations: initialAnnotations,
   });
 

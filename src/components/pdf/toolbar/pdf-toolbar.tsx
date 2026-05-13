@@ -105,7 +105,7 @@ export function PdfToolbar() {
           onClick={toggleThumbnails}
           title="Toggle thumbnails"
         >
-          🖼️
+        {showThumbnails ? '⍇' : '⍈'}  
         </button>
       </div>
     </div>
