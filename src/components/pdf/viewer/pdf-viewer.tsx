@@ -120,20 +120,93 @@ export function PdfViewerPage({ pageNumber, className = '' }: PdfViewerPageProps
 // ---------------------------------------------------------------------------
 
 export function PdfViewerPages({ className = '' }: { className?: string }) {
-  const { state } = usePdfViewer();
+  const { state, setCurrentPage } = usePdfViewer();
   const containerRef = useRef<HTMLDivElement>(null);
+  const skipNextScrollRef = useRef(false);
+  const isProgrammaticScroll = useRef(false);
+  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pageRatiosRef = useRef<Map<number, number>>(new Map());
+  const currentPageRef = useRef(state.currentPage);
 
+  // Keep ref in sync with state for observer callback
   useEffect(() => {
+    currentPageRef.current = state.currentPage;
+  }, [state.currentPage]);
+
+  // Scroll viewer to currentPage when it changes from external source (e.g., thumbnail click)
+  useEffect(() => {
+    if (skipNextScrollRef.current) {
+      skipNextScrollRef.current = false;
+      return;
+    }
+
     const container = containerRef.current;
     if (!container || state.numPages === 0) return;
     const target = container.querySelector<HTMLElement>(
       `[data-page-number="${state.currentPage}"]`
     );
     if (target) {
-      // scroll within the closest scrollable ancestor
+      isProgrammaticScroll.current = true;
       target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+      scrollTimeoutRef.current = setTimeout(() => {
+        isProgrammaticScroll.current = false;
+      }, 600);
     }
   }, [state.currentPage, state.numPages]);
+
+  // IntersectionObserver to detect most-visible page during user scroll
+  useEffect(() => {
+    if (state.numPages === 0) return;
+
+    const container = containerRef.current;
+    if (!container) return;
+    const scrollParent = container.parentElement;
+    if (!scrollParent) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (isProgrammaticScroll.current) return;
+
+        entries.forEach((entry) => {
+          const pageNum = Number(
+            (entry.target as HTMLElement).getAttribute('data-page-number')
+          );
+          if (entry.isIntersecting) {
+            pageRatiosRef.current.set(pageNum, entry.intersectionRatio);
+          } else {
+            pageRatiosRef.current.delete(pageNum);
+          }
+        });
+
+        let bestPage = currentPageRef.current;
+        let bestRatio = 0;
+        pageRatiosRef.current.forEach((ratio, pageNum) => {
+          if (ratio > bestRatio) {
+            bestRatio = ratio;
+            bestPage = pageNum;
+          }
+        });
+
+        if (bestPage !== currentPageRef.current && bestRatio > 0) {
+          skipNextScrollRef.current = true;
+          setCurrentPage(bestPage);
+        }
+      },
+      {
+        root: scrollParent,
+        threshold: [0, 0.1, 0.25, 0.5, 0.75, 1],
+      }
+    );
+
+    const pages = container.querySelectorAll<HTMLElement>('[data-page-number]');
+    pages.forEach((page) => observer.observe(page));
+
+    return () => {
+      observer.disconnect();
+      pageRatiosRef.current.clear();
+    };
+  }, [state.numPages, setCurrentPage]);
 
   if (state.numPages === 0) return null;
   return (

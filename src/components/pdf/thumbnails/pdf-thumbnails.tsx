@@ -1,9 +1,18 @@
 import { Page } from 'react-pdf';
+import { useEffect, useRef } from 'react';
 import { usePdfViewer } from '../viewer/pdf-viewer-context';
 
 export function PdfThumbnails() {
   const { state, setCurrentPage } = usePdfViewer();
   const { numPages, currentPage, file, showThumbnails } = state;
+  const activeThumbRef = useRef<HTMLButtonElement>(null);
+
+  // Scroll active thumbnail into view when currentPage changes
+  useEffect(() => {
+    if (activeThumbRef.current) {
+      activeThumbRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, [currentPage]);
 
   if (!showThumbnails || !file || numPages === 0) return null;
 
@@ -16,6 +25,7 @@ export function PdfThumbnails() {
         {Array.from({ length: numPages }, (_, i) => i + 1).map((pageNum) => (
           <button
             key={pageNum}
+            ref={currentPage === pageNum ? activeThumbRef : null}
             className={`relative flex flex-col items-center gap-1 p-2 border-2 border-transparent rounded-md transition-all duration-150 cursor-pointer hover:bg-social-bg ${
               currentPage === pageNum ? 'border-accent bg-accent-bg' : 'bg-transparent'
             }`}
