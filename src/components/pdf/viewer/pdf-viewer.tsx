@@ -118,7 +118,7 @@ export function PdfViewerPages({ className = '' }: { className?: string }) {
     );
     if (target) {
       isProgrammaticScroll.current = true;
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      target.scrollIntoView({ behavior: 'instant', block: 'start' });
     }
   }, [state.currentPage, state.numPages]);
 
