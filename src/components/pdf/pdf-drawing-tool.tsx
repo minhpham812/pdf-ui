@@ -138,6 +138,13 @@ export function PdfDrawingTool() {
                 title={`Draw color ${color}`}
               />
             ))}
+            <input
+              type="color"
+              value={strokeColor}
+              onChange={(e) => setStrokeColor(e.target.value)}
+              className="w-5 h-5 rounded cursor-pointer border-0 bg-transparent"
+              title="Custom color"
+            />
           </div>
           <div className="w-px h-5 bg-border" />
           <div className="flex items-center gap-1">
