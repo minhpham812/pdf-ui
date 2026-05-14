@@ -1,75 +1,190 @@
-# React + TypeScript + Vite
+# PDF UI — React PDF Viewer with Annotations
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React-based PDF viewer with annotation tools. Load PDFs, navigate pages, zoom, highlight text, draw freehand strokes, and export the annotated PDF.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+| Layer | Technology |
+|-------|-----------|
+| Framework | React 19.2.6 + TypeScript 6.0.2 |
+| Build | Vite 8.0.12 + @tailwindcss/vite 4.3.0 |
+| Styling | Tailwind CSS v4 (CSS-first config) |
+| PDF Rendering | react-pdf 10.4.1 (pdfjs-dist 5.4.296) |
+| PDF Manipulation | pdf-lib 1.17.1 |
+| UI Primitives | @base-ui/react 1.4.1 |
+| Icons | lucide-react 1.14.0 |
+| Compiler | Babel React Compiler |
 
-## React Compiler
+## Features
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+### PDF Loading
+Drop a PDF file onto the drop zone or click to open the file picker.
 
-Note: This will impact Vite dev & build performances.
+### Page Navigation
+Use `<` and `>` buttons in the toolbar, or type a page number directly in the page input field.
 
-## Expanding the ESLint configuration
+### Zoom
+Click `-` or `+` to zoom in/out by 0.25 steps. Click the reset icon to return to 1.0x scale.
+- Scale limits: 25% — 500%
+- Presets: `[0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3, 4]`
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Thumbnail Sidebar
+Click the sidebar toggle icon in the toolbar to show/hide the thumbnail panel. Click any thumbnail to jump directly to that page.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Highlight Tool
+Click the highlight icon in the toolbar, pick a color, then select text on the PDF. A semi-transparent rectangle appears over the selection.
+- Colors: Yellow, green, blue, rose, orange (plus custom color picker)
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Drawing Tool
+Click the pencil icon in the toolbar, pick a color and stroke width, then click-and-drag on the PDF to draw freehand strokes.
+- Colors: Red, orange, yellow, green, blue, violet, pink, black
+- Stroke widths: 2, 4, 6, 8 pixels
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Eraser Tool
+Click the eraser icon in the toolbar, then click (or click-drag) on any annotation to delete it. Works on both highlights and drawings.
+
+### Save PDF
+Click the download icon in the toolbar to export `annotated.pdf` — the original PDF with all annotations rendered on top.
+
+## Usage
+
+```tsx
+import { PdfViewer } from './components/pdf';
+
+function App() {
+  return (
+    <PdfViewer.Root url={pdfUrl} initialScale={1} className="w-screen h-screen">
+      <PdfViewer.Toolbar />
+      <PdfViewer.Thumbnails />
+      <PdfViewer.Pages />
+      <PdfViewer.HighlightTool />
+      <PdfViewer.DrawingTool />
+    </PdfViewer.Root>
+  );
+}
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Architecture
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Composite Component Pattern
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+All PDF components follow a composite pattern:
+
+```tsx
+export const PdfViewer = {
+  Root: PdfViewerRoot,
+  Page: PdfViewerPage,
+  Pages: PdfViewerPages,
+  Toolbar: PdfToolbar,
+  Thumbnails: PdfThumbnails,
+  AnnotationLayer: PdfAnnotationLayer,
+  HighlightTool: PdfHighlightTool,
+  DrawingTool: PdfDrawingTool,
+};
+```
+
+### Context + Reducer State
+
+- `PdfViewerContext` — Main state: file, pages, scale, activeTool, annotations, etc.
+- `DrawingContext` — Transient drawing state: tempStroke, strokeColor, strokeWidth
+
+### Percentage-Based Positioning
+
+All annotation coordinates are stored as percentages (0–100) of page dimensions. Annotations maintain correct position/size at any zoom level.
+
+### Annotation Data Model
+
+```ts
+interface PdfAnnotation {
+  id: string;
+  page: number;
+  type: 'highlight' | 'drawing';
+  x: number;       // percentage (0-100)
+  y: number;      // percentage (0-100)
+  width: number;  // percentage (0-100)
+  height: number; // percentage (0-100)
+  color: string;  // hex color
+  content?: string;
+  createdAt: number;
+  points?: DrawingPoint[]; // for drawing type
+}
+```
+
+## File Structure
+
+```
+src/
+├── App.tsx
+├── main.tsx
+├── index.css
+├── utils/
+│   ├── pdf-worker.ts
+│   └── pdf-save-utils.ts
+└── components/pdf/
+    ├── index.ts
+    ├── index.parts.ts
+    ├── pdf-page.tsx
+    ├── pdf-highlight-tool.tsx
+    ├── pdf-drawing-tool.tsx
+    ├── types/
+    │   └── pdf-annotation.ts
+    ├── viewer/
+    │   ├── pdf-viewer-context.ts
+    │   ├── pdf-viewer-reducer.ts
+    │   ├── pdf-viewer-provider.tsx
+    │   ├── pdf-viewer.tsx
+    │   └── pdf-viewer-composite.ts
+    ├── toolbar/
+    │   └── pdf-toolbar.tsx
+    ├── thumbnails/
+    │   └── pdf-thumbnails.tsx
+    ├── annotation-layer/
+    │   └── pdf-annotation-layer.tsx
+    ├── drawing-tool/
+    │   ├── drawing-context.tsx
+    │   └── use-drawing.ts
+    └── hooks/
+        ├── use-viewport-scale.ts
+        ├── use-annotation-store.ts
+        └── use-pdf-document.ts
+```
+
+## Development
+
+```bash
+# Install dependencies
+yarn install
+
+# Start dev server
+yarn dev
+
+# Build for production
+yarn build
+
+# Preview production build
+yarn preview
+```
+
+## Expanding the Project
+
+### Adding a New Tool
+
+1. Define tool type in `ActiveTool` in `pdf-viewer-reducer.ts`
+2. Add toggle button in `pdf-toolbar.tsx`
+3. Create tool component following `pdf-highlight-tool.tsx` pattern
+4. Add annotation type to `PdfAnnotation`
+5. Handle rendering in `pdf-annotation-layer.tsx`
+6. Handle save logic in `pdf-save-utils.ts`
+
+### Keyboard Shortcuts (Not Implemented Yet)
+
+```ts
+useEffect(() => {
+  const handler = (e: KeyboardEvent) => {
+    if (e.key === 'ArrowRight') nextPage();
+    if (e.key === 'ArrowLeft') prevPage();
+  };
+  window.addEventListener('keydown', handler);
+  return () => window.removeEventListener('keydown', handler);
+}, [nextPage]);
 ```
