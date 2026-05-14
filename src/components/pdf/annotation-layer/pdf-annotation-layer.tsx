@@ -1,10 +1,8 @@
 import { usePdfViewer } from '../viewer/pdf-viewer-context';
+import { useDrawing } from '../drawing-tool/use-drawing';
 
 interface PdfAnnotationLayerProps {
   pageNumber: number;
-  tempStroke?: Array<{ x: number; y: number }> | null;
-  strokeColor?: string;
-  strokeWidth?: number;
 }
 
 /**
@@ -12,14 +10,10 @@ interface PdfAnnotationLayerProps {
  * - Drawings: freehand strokes as SVG polylines
  * - Highlights: semi-transparent colored rectangles
  */
-export function PdfAnnotationLayer({
-  pageNumber,
-  tempStroke,
-  strokeColor = '#ef4444',
-  strokeWidth = 2,
-}: PdfAnnotationLayerProps) {
+export function PdfAnnotationLayer({ pageNumber }: PdfAnnotationLayerProps) {
   const { state, removeAnnotation } = usePdfViewer();
   const { annotations } = state;
+  const { tempStroke, strokeColor, strokeWidth, activeDrawingPage } = useDrawing();
 
   const pageAnnotations = annotations.filter((a) => a.page === pageNumber);
 
@@ -101,8 +95,8 @@ export function PdfAnnotationLayer({
 
       })}
 
-      {/* Live stroke preview */}
-      {tempStroke && tempStroke.length >= 2 && (
+      {/* Live stroke preview - only on the active drawing page */}
+      {activeDrawingPage === pageNumber && tempStroke && tempStroke.length >= 2 && (
         <svg
           className="absolute inset-0 w-full h-full pointer-events-none overflow-visible"
           viewBox="0 0 100 100"

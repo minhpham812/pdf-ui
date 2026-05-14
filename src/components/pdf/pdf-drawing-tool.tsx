@@ -23,7 +23,7 @@ const STROKE_WIDTHS = [2, 4, 6, 8] as const;
 export function PdfDrawingTool() {
   const { state, addAnnotation } = usePdfViewer();
   const { activeTool } = state;
-  const { setTempStroke, strokeColor, setStrokeColor, strokeWidth, setStrokeWidth } = useDrawing();
+  const { setTempStroke, strokeColor, setStrokeColor, strokeWidth, setStrokeWidth, setActiveDrawingPage } = useDrawing();
 
   const isDrawingRef = useRef(false);
   const pageContainerRef = useRef<HTMLElement | null>(null);
@@ -51,6 +51,11 @@ export function PdfDrawingTool() {
       const pos = getLocalPosition(e, container);
       currentStrokeRef.current = [pos];
       setTempStroke([pos]);
+
+      const pageAttr = container.getAttribute('data-page-number');
+      if (pageAttr) {
+        setActiveDrawingPage(Number(pageAttr));
+      }
     };
 
     const handleMouseMove = (e: MouseEvent) => {
@@ -102,6 +107,7 @@ export function PdfDrawingTool() {
 
       currentStrokeRef.current = [];
       setTempStroke(null);
+      setActiveDrawingPage(null);
     };
 
     document.addEventListener('mousedown', handleMouseDown);

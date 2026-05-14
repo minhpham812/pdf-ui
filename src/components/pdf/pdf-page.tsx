@@ -1,7 +1,6 @@
 import { Page } from 'react-pdf';
 import { usePdfViewer } from './viewer/pdf-viewer-context';
 import { PdfAnnotationLayer } from './annotation-layer/pdf-annotation-layer';
-import { useDrawing } from './drawing-tool/use-drawing';
 
 export interface PdfViewerPageProps {
   pageNumber: number;
@@ -13,7 +12,6 @@ export interface PdfViewerPageProps {
  */
 export function PdfViewerPage({ pageNumber, className = '' }: PdfViewerPageProps) {
   const { state } = usePdfViewer();
-  const { tempStroke, strokeColor, strokeWidth } = useDrawing();
   return (
     <div
       data-page-number={pageNumber}
@@ -27,12 +25,7 @@ export function PdfViewerPage({ pageNumber, className = '' }: PdfViewerPageProps
         renderTextLayer={true}
         renderMode="canvas"
       />
-      <PdfAnnotationLayer
-        pageNumber={pageNumber}
-        tempStroke={tempStroke}
-        strokeColor={strokeColor}
-        strokeWidth={strokeWidth}
-      />
+      <PdfAnnotationLayer pageNumber={pageNumber} />
     </div>
   );
 }
