@@ -85,13 +85,15 @@ export function PdfDrawingTool() {
       }
       const pageNumber = Number(pageAttr);
 
-      // Calculate bounding box
+      // Calculate bounding box with a small padding so perfectly
+      // horizontal/vertical strokes still have a visible container
       const xs = points.map((p) => p.x);
       const ys = points.map((p) => p.y);
-      const minX = Math.min(...xs);
-      const minY = Math.min(...ys);
-      const maxX = Math.max(...xs);
-      const maxY = Math.max(...ys);
+      const padding = 1;
+      const minX = Math.max(0, Math.min(...xs) - padding);
+      const minY = Math.max(0, Math.min(...ys) - padding);
+      const maxX = Math.min(100, Math.max(...xs) + padding);
+      const maxY = Math.min(100, Math.max(...ys) + padding);
 
       addAnnotation({
         page: pageNumber,
